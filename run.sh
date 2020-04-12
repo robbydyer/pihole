@@ -6,6 +6,17 @@ if ! dpkg -l | grep docker.io; then
   apt-get install -y docker.io
 fi
 
+docker pull mvance/unbound:latest
+docker pull pihole/pihole:latest
+
+docker run -d \
+  --name my-unbound \
+  -p 5353:5353/udp \
+  -p 5353:5353/tcp \
+  -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pi-hole.conf \
+  --restart=unless-stopped \
+  mvance/unbound:latest
+
 docker run -d \
   --restart=unless-stopped \
   --privileged \
