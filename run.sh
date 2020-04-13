@@ -1,5 +1,6 @@
 #!/bin/bash
 # Run this on the Raspberry-pi to start the container
+set -euo pipefail
 
 NET="piholenet"
 UNBOUND="klutchell/unbound:latest"
@@ -22,13 +23,16 @@ if docker inspect unbound > /dev/null; then
   docker rm unbound
 fi
 
+mkdir -p /var/log/unbound || true
+
 docker run -d \
   --name unbound \
   --network "${NET}" \
   --privileged \
-  -v "$(pwd)/unbound.conf":/opt/unbound/etc/unbound/unbound.conf \
+  -v "$(pwd)/unbound-entrypoint.sh":/unbound-entrypoint.sh \
   -v /var/log/unbound.log:/var/log/unbound.log \
   --restart=unless-stopped \
+  --entrypoint=/unbound-entrypoint.sh \
   "${UNBOUND}"
 
 if ! docker inspect pihole > /dev/null; then
