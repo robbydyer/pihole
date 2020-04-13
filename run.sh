@@ -64,7 +64,7 @@ docker run -d \
   --publish 53:53/tcp \
   -e TZ="America/New York" \
   -e VIRTUAL_HOST=pihole.local \
-  -e PIHOLE_DNS_1="${UNBOUND_IP}#5354" \
+  -e DNS1="${UNBOUND_IP}#5354" \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
   pihole/pihole:latest
