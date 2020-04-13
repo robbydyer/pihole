@@ -1,5 +1,4 @@
 FROM debian:buster as openssl
-LABEL maintainer="Matthew Vance"
 
 ENV VERSION_OPENSSL=openssl-1.1.1f \
     SHA256_OPENSSL=186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35 \
@@ -42,7 +41,6 @@ RUN set -e -x && \
         /var/lib/apt/lists/*
 
 FROM debian:buster as unbound
-LABEL maintainer="Matthew Vance"
 
 ENV NAME=unbound \
     UNBOUND_VERSION=1.10.0 \
