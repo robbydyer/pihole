@@ -16,16 +16,20 @@ if ! docker network inspect "${NET}"; then
   docker network create "${NET}"
 fi
 
-if ! docker inspect unbound > /dev/null; then
-  # This is the recursive DNS server
-  docker run -d \
-    --name unbound \
-    --network "${NET}" \
-    --privileged \
-    -v "$(pwd)/unbound.conf":/opt/unbound/etc/unbound/unbound.conf.d/pi-hole.conf \
-    --restart=unless-stopped \
-    "${UNBOUND}"
+# Restart unbound each time
+if docker inspect unbound > /dev/null; then
+  docker kill unbound
+  docker rm unbound
 fi
+
+docker run -d \
+  --name unbound \
+  --network "${NET}" \
+  --privileged \
+  -v "$(pwd)/unbound.conf":/opt/unbound/etc/unbound/unbound.conf \
+  -v /var/log/unbound.log:/var/log/unbound.log \
+  --restart=unless-stopped \
+  "${UNBOUND}"
 
 if ! docker inspect pihole > /dev/null; then
   docker run -d \
