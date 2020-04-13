@@ -29,6 +29,8 @@ docker run -d \
   --name unbound \
   --network "${NET}" \
   --privileged \
+  --publish 5353:5353/udp \
+  --publish 5353:5353/tcp \
   -v "$(pwd)/unbound-entrypoint.sh":/unbound-entrypoint.sh \
   -v /var/log/unbound.log:/var/log/unbound.log \
   --restart=unless-stopped \
