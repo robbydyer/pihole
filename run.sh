@@ -3,7 +3,8 @@
 set -euo pipefail
 
 NET="piholenet"
-UNBOUND="mvance/unbound:latest"
+#UNBOUND="mvance/unbound:latest"
+UNBOUND="myunbound:latest"
 
 if ! dpkg -l | grep docker.io; then
   apt-get update
@@ -17,6 +18,10 @@ docker pull pihole/pihole:latest
 
 if ! docker network inspect "${NET}" &> /dev/null; then 
   docker network create "${NET}"
+fi
+
+if ! docker images | grep "${UNBOUND}"; then
+  docker build -f Dockerfile.unbound -t "${UNBOUND}" .
 fi
 
 # Restart unbound each time
