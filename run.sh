@@ -7,7 +7,9 @@ UNBOUND="klutchell/unbound:latest"
 
 if ! dpkg -l | grep docker.io; then
   apt-get update
-  apt-get install -y docker.io
+  apt-get install -y \
+    docker.io \
+    lsof
 fi
 
 docker pull "${UNBOUND}"
@@ -23,7 +25,7 @@ if docker inspect unbound > /dev/null; then
   docker rm unbound
 fi
 
-mkdir -p /var/log/unbound || true
+touch /var/log/unbound.log
 
 docker run -d \
   --name unbound \
