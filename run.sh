@@ -3,7 +3,7 @@
 set -euo pipefail
 
 NET="piholenet"
-UNBOUND="klutchell/unbound:latest"
+UNBOUND="mvance/unbound:latest"
 
 if ! dpkg -l | grep docker.io; then
   apt-get update
