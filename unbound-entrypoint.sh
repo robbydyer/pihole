@@ -121,7 +121,7 @@ server:
     logfile: ""
 
     # Only log errors
-    verbosity: 0
+    verbosity: 1
 
     ###########################################################################
     # PRIVACY SETTINGS
