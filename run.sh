@@ -37,7 +37,7 @@ docker run -d \
   --publish 5354:5353/tcp \
   -v "$(pwd)/unbound-entrypoint.sh":/unbound-entrypoint.sh \
   -v /var/log/unbound.log:/var/log/unbound.log \
-  --restart=unless-stopped \
+  #--restart=unless-stopped \
   --entrypoint=/unbound-entrypoint.sh \
   "${UNBOUND}" \
   /unbound-entrypoint.sh
