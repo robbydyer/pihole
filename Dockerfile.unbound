@@ -1,46 +1,4 @@
-FROM arm32v7/debian as openssl
-
-ENV VERSION_OPENSSL=openssl-1.1.1f \
-    SHA256_OPENSSL=186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35 \
-    SOURCE_OPENSSL=https://www.openssl.org/source/ \
-    OPGP_OPENSSL=8657ABB260F056B1E5190839D9C4D26D0E604491
-
-WORKDIR /tmp/src
-
-RUN set -e -x && \
-    build_deps="build-essential ca-certificates curl dirmngr gnupg libidn2-0-dev libssl-dev" && \
-    DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
-      $build_deps && \
-    curl -L $SOURCE_OPENSSL$VERSION_OPENSSL.tar.gz -o openssl.tar.gz && \
-    echo "${SHA256_OPENSSL} ./openssl.tar.gz" | sha256sum -c - && \
-    curl -L $SOURCE_OPENSSL$VERSION_OPENSSL.tar.gz.asc -o openssl.tar.gz.asc && \
-    GNUPGHOME="$(mktemp -d)" && \
-    export GNUPGHOME && \
-    ( gpg --no-tty --keyserver ipv4.pool.sks-keyservers.net --recv-keys "$OPGP_OPENSSL" \
-    || gpg --no-tty --keyserver ha.pool.sks-keyservers.net --recv-keys "$OPGP_OPENSSL" ) && \
-    gpg --batch --verify openssl.tar.gz.asc openssl.tar.gz && \
-    tar xzf openssl.tar.gz && \
-    cd $VERSION_OPENSSL && \
-    ./config \
-      --prefix=/opt/openssl \
-      --openssldir=/opt/openssl \
-      no-weak-ssl-ciphers \
-      no-ssl3 \
-      no-shared \
-      enable-ec_nistp_64_gcc_128 \
-      -DOPENSSL_NO_HEARTBEATS \
-      -fstack-protector-strong && \
-    make depend && \
-    make && \
-    make install_sw && \
-    apt-get purge -y --auto-remove \
-      $build_deps && \
-    rm -rf \
-        /tmp/* \
-        /var/tmp/* \
-        /var/lib/apt/lists/*
-
-FROM arm32v7/debian as unbound
+FROM arm32v7/debian:buster as unbound
 
 ENV NAME=unbound \
     UNBOUND_VERSION=1.10.0 \
@@ -49,9 +7,7 @@ ENV NAME=unbound \
 
 WORKDIR /tmp/src
 
-COPY --from=openssl /opt/openssl /opt/openssl
-
-RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make" && \
+RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make openssl" && \
     set -x && \
     DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
       $build_deps \
@@ -89,7 +45,6 @@ RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make" && \
 
 
 FROM debian:buster
-LABEL maintainer="Matthew Vance"
 
 ENV NAME=unbound \
     VERSION=1.4 \
