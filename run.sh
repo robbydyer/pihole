@@ -45,20 +45,26 @@ docker run -d \
 
 UNBOUND_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' unbound)"
 
-if ! docker inspect pihole > /dev/null; then
-  docker run -d \
-    --name pihole \
-    --network "${NET}" \
-    --restart=unless-stopped \
-    --privileged \
-    --publish 80:80 \
-    --publish 443:443 \
-    --publish 53:53/udp \
-    --publish 53:53/tcp \
-    -e TZ="America/New York" \
-    -e VIRTUAL_HOST=pihole.local \
-    -e PIHOLE_DNS_1="${UNBOUND_IP}#5354" \
-    -v "$(pwd)/pihole":/etc/pihole \
-    -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
-    pihole/pihole:latest
+if docker inspect pihole &> /dev/null; then
+  if docker ps | grep pihole &> /dev/null; then
+    docker kill pihole
+  fi
+  docker rm pihole
 fi
+
+set -x
+docker run -d \
+  --name pihole \
+  --network "${NET}" \
+  --restart=unless-stopped \
+  --privileged \
+  --publish 80:80 \
+  --publish 443:443 \
+  --publish 53:53/udp \
+  --publish 53:53/tcp \
+  -e TZ="America/New York" \
+  -e VIRTUAL_HOST=pihole.local \
+  -e PIHOLE_DNS_1="${UNBOUND_IP}#5354" \
+  -v "$(pwd)/pihole":/etc/pihole \
+  -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
+  pihole/pihole:latest

@@ -7,3 +7,4 @@ pihole/GitHubVersions
 pihole/list.*
 pihole/localbranches
 pihole/localversions
+pihole/setupVars.conf
