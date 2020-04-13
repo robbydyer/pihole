@@ -118,7 +118,7 @@ server:
 
     # Further limit logging
     # logfile: /var/log/unbound.log
-    logfile: /proc/self/fd/1
+    logfile: /dev/stdout
 
     # Only log errors
     verbosity: 0

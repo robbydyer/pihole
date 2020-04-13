@@ -15,7 +15,7 @@ fi
 docker pull "${UNBOUND}"
 docker pull pihole/pihole:latest
 
-if ! docker network inspect "${NET}"; then 
+if ! docker network inspect "${NET}" &> /dev/null; then 
   docker network create "${NET}"
 fi
 
