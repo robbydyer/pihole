@@ -20,7 +20,7 @@ if ! docker network inspect "${NET}"; then
 fi
 
 # Restart unbound each time
-if docker inspect unbound > /dev/null; then
+if docker inspect unbound &> /dev/null; then
   if docker ps | grep unbound &> /dev/nulll; then
     docker kill unbound
   fi

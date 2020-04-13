@@ -112,7 +112,8 @@ server:
     log-servfail: yes
 
     # Further limit logging
-    logfile: /var/log/unbound.log
+    # logfile: /var/log/unbound.log
+    logfile: /proc/self/fd/1
 
     # Only log errors
     verbosity: 0
