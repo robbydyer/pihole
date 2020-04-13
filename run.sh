@@ -40,8 +40,6 @@ docker run -d \
   --no-healthcheck \
   --publish 5354:5353/udp \
   --publish 5354:5353/tcp \
-  -v "$(pwd)/unbound.sh":/unbound.sh \
-  -v /var/log/unbound.log:/var/log/unbound.log \
   "${UNBOUND}"
 
 if ! docker inspect pihole > /dev/null; then
