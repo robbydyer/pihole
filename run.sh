@@ -9,15 +9,22 @@ fi
 docker pull mvance/unbound:latest
 docker pull pihole/pihole:latest
 
+NET="piholenet"
+
+if !docker network inspect "${NET}" &> /dev/null; then 
+  docker network create "${NET}"
+fi
+
 docker run -d \
-  --name my-unbound \
-  -p 5353:5353/udp \
-  -p 5353:5353/tcp \
+  --name unbound \
+  --network "${NET}" \
   -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pi-hole.conf \
   --restart=unless-stopped \
   mvance/unbound:latest
 
 docker run -d \
+  --name pihole \
+  --network "${NET}" \
   --restart=unless-stopped \
   --privileged \
   --publish 80:80 \
