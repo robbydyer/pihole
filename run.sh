@@ -22,7 +22,7 @@ if ! docker inspect unbound > /dev/null; then
     --name unbound \
     --network "${NET}" \
     --privileged \
-    -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pi-hole.conf \
+    -v "$(pwd)/unbound.conf":/opt/unbound/etc/unbound/unbound.conf.d/pi-hole.conf \
     --restart=unless-stopped \
     "${UNBOUND}"
 fi
@@ -35,7 +35,6 @@ if ! docker inspect pihole > /dev/null; then
     --privileged \
     --publish 80:80 \
     --publish 443:443 \
-    --publish 67:67/udp \
     --publish 53:53/udp \
     --publish 53:53/tcp \
     --dns=127.0.0.1 \
