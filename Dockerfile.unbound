@@ -1,119 +1,16 @@
-FROM multiarch/debian-debootstrap:armhf-stretch-slim as openssl
-
-ENV VERSION_OPENSSL=openssl-1.1.1f \
-    SHA256_OPENSSL=186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35 \
-    SOURCE_OPENSSL=https://www.openssl.org/source/ \
-
-WORKDIR /tmp/src
-
-RUN set -e -x && \
-    build_deps="build-essential ca-certificates curl dirmngr gnupg libidn2-0-dev libssl-dev" && \
-    DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
-      $build_deps && \
-    curl -L $SOURCE_OPENSSL$VERSION_OPENSSL.tar.gz -o openssl.tar.gz && \
-    echo "${SHA256_OPENSSL} ./openssl.tar.gz" | sha256sum -c - && \
-    tar xzf openssl.tar.gz && \
-    cd $VERSION_OPENSSL && \
-    ./config \
-      --prefix=/opt/openssl \
-      --openssldir=/opt/openssl \
-      no-weak-ssl-ciphers \
-      no-ssl3 \
-      no-shared \
-      enable-ec_nistp_64_gcc_128 \
-      -DOPENSSL_NO_HEARTBEATS \
-      -fstack-protector-strong && \
-    make depend && \
-    make && \
-    make install_sw && \
-    apt-get purge -y --auto-remove \
-      $build_deps && \
-    rm -rf \
-        /tmp/* \
-        /var/tmp/* \
-        /var/lib/apt/lists/*
-
-FROM multiarch/debian-debootstrap:armhf-stretch-slim as unbound
-
-ENV NAME=unbound \
-    UNBOUND_VERSION=1.10.0 \
-    UNBOUND_SHA256=152f486578242fe5c36e89995d0440b78d64c05123990aae16246b7f776ce955 \
-    UNBOUND_DOWNLOAD_URL=https://nlnetlabs.nl/downloads/unbound/unbound-1.10.0.tar.gz
-
-WORKDIR /tmp/src
-
-COPY --from=openssl /opt/openssl /opt/openssl
-
-RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make" && \
-    set -x && \
-    DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
-      $build_deps \
-      bsdmainutils \
-      ca-certificates \
-      ldnsutils \
-      libevent-2.0-5 \
-      libexpat1 && \
-    curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz && \
-    echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
-    tar xzf unbound.tar.gz && \
-    rm -f unbound.tar.gz && \
-    cd unbound-1.10.0 && \
-    groupadd _unbound && \
-    useradd -g _unbound -s /etc -d /dev/null _unbound && \
-    ./configure \
-        --disable-dependency-tracking \
-        --prefix=/opt/unbound \
-        --with-pthreads \
-        --with-username=_unbound \
-        --with-libevent \
-	--with-ssl=/opt/openssl \
-        --enable-tfo-server \
-        --enable-tfo-client \
-        --enable-event-api && \
-    make install && \
-    mv /opt/unbound/etc/unbound/unbound.conf /opt/unbound/etc/unbound/unbound.conf.example && \
-    apt-get purge -y --auto-remove \
-      $build_deps && \
-    rm -rf \
-        /opt/unbound/share/man \
-        /tmp/* \
-        /var/tmp/* \
-        /var/lib/apt/lists/*
-
 FROM multiarch/debian-debootstrap:armhf-stretch-slim
 
-ENV NAME=unbound \
-    VERSION=1.4 \
-    SUMMARY="${NAME} is a validating, recursive, and caching DNS resolver." \
-    DESCRIPTION="${NAME} is a validating, recursive, and caching DNS resolver."
+ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /tmp/src
+RUN apt-get update && \
+    apt-get install -y \
+    dnsutils \
+    unbound && \
+    apt-get purge -y --auto-remove
 
-COPY --from=unbound /opt /opt
+ADD ./unbound-root.key /var/lib/unbound/root.key
 
-RUN set -x && \
-    DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends \
-      openssl \
-      bsdmainutils \
-      ca-certificates \
-      ldnsutils \
-      libevent-2.1-6\
-      libexpat1 && \
-    groupadd _unbound && \
-    useradd -g _unbound -s /etc -d /dev/null _unbound && \
-    apt-get purge -y --auto-remove \
-      $build_deps && \
-    rm -rf \
-        /opt/unbound/share/man \
-        /tmp/* \
-        /var/tmp/* \
-        /var/lib/apt/lists/*
+ADD https://www.internic.net/domain/named.root /var/lib/unbound/root.hints
+RUN chmod 644 /var/lib/unbound/root.hints
 
-COPY a-records.conf /opt/unbound/etc/unbound/
-COPY unbound.sh /
-
-RUN chmod +x /unbound.sh
-
-WORKDIR /opt/unbound/
-
-ENV PATH /opt/unbound/sbin:"$PATH"
+ENTRYPOINT ["/usr/sbin/unbound", "-d"]

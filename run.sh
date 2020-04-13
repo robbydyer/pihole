@@ -37,9 +37,7 @@ docker run -d \
   --name unbound \
   --network "${NET}" \
   --privileged \
-  --no-healthcheck \
-  --publish 5354:5353/udp \
-  --publish 5354:5353/tcp \
+  -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pihole.conf \
   "${UNBOUND}"
 
 if ! docker inspect pihole > /dev/null; then
