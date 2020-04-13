@@ -11,13 +11,15 @@ docker pull pihole/pihole:latest
 
 NET="piholenet"
 
-if !docker network inspect "${NET}" &> /dev/null; then 
+if ! docker network inspect "${NET}"; then 
   docker network create "${NET}"
 fi
 
+# This is the recursive DNS server
 docker run -d \
   --name unbound \
   --network "${NET}" \
+  --privileged \
   -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pi-hole.conf \
   --restart=unless-stopped \
   mvance/unbound:latest
