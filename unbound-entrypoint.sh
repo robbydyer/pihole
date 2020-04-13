@@ -1,4 +1,8 @@
 #!/bin/bash
+set -euo pipefail
+set -x
+
+mkdir -p /opt/unbound/etc/unbound
 
 reserved=12582912
 availableMemory=$((1024 * $( (grep MemAvailable /proc/meminfo || grep MemTotal /proc/meminfo) | sed 's/[^0-9]//g' ) ))
