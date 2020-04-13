@@ -65,6 +65,8 @@ docker run -d \
   -e TZ="America/New York" \
   -e VIRTUAL_HOST=pihole.local \
   -e DNS1="${UNBOUND_IP}#5354" \
+  -e DNS2="" \
+  -e DNSSEC=true \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
   pihole/pihole:latest
