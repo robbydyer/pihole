@@ -1,4 +1,6 @@
 #!/bin/bash
+
+set -euo pipefail
 set -x
 
 mkdir -p /opt/unbound/etc/unbound
