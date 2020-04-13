@@ -41,6 +41,7 @@ if [ ! -f /opt/unbound/etc/unbound/unbound.conf ]; then
         > /opt/unbound/etc/unbound/unbound.conf << EOT
 server:
     # MY things
+    interface: 0.0.0.0@5353
     port: 5353
     do-ip4: yes
     do-udp: yes
