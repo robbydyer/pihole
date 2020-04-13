@@ -5,6 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
     dnsutils \
+    lsof \
     unbound && \
     apt-get purge -y --auto-remove
 
@@ -12,5 +13,8 @@ ADD ./unbound-root.key /var/lib/unbound/root.key
 
 ADD https://www.internic.net/domain/named.root /var/lib/unbound/root.hints
 RUN chmod 644 /var/lib/unbound/root.hints
+
+EXPOSE 5354/udp
+EXPOSE 5354/tcp
 
 ENTRYPOINT ["/usr/sbin/unbound", "-d"]

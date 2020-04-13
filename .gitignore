@@ -1,1 +1,9 @@
 *.swp
+*.list
+*.domains
+*.db
+*.bak
+pihole/GitHubVersions
+pihole/list.*
+pihole/localbranches
+pihole/localversions

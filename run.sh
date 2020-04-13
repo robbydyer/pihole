@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run this on the Raspberry-pi to start the container
+# Run this on the Raspberry-pi to start the containers
 set -euo pipefail
 
 NET="piholenet"
@@ -10,6 +10,7 @@ if ! dpkg -l | grep docker.io; then
   apt-get update
   apt-get install -y \
     docker.io \
+    dnsutils \
     lsof
 fi
 
@@ -37,8 +38,12 @@ docker run -d \
   --name unbound \
   --network "${NET}" \
   --privileged \
+  --publish 5354:5354/udp \
+  --publish 5354:5354/tcp \
   -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pihole.conf \
   "${UNBOUND}"
+
+UNBOUND_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' unbound)"
 
 if ! docker inspect pihole > /dev/null; then
   docker run -d \
@@ -50,11 +55,9 @@ if ! docker inspect pihole > /dev/null; then
     --publish 443:443 \
     --publish 53:53/udp \
     --publish 53:53/tcp \
-    --dns=127.0.0.1 \
-    --dns=1.1.1.1 \
     -e TZ="America/New York" \
     -e VIRTUAL_HOST=pihole.local \
-    -e PIHOLE_DNS_1=127.0.0.1#5353 \
+    -e PIHOLE_DNS_1="${UNBOUND_IP}#5354" \
     -v "$(pwd)/pihole":/etc/pihole \
     -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
     pihole/pihole:latest
