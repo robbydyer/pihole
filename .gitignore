@@ -8,3 +8,4 @@ pihole/list.*
 pihole/localbranches
 pihole/localversions
 pihole/setupVars.conf
+dnsmasq/01-pihole.conf
