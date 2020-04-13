@@ -1,9 +1,8 @@
-FROM arm32v7/debian:buster as openssl
+FROM multiarch/debian-debootstrap:armhf-stretch-slim as openssl
 
 ENV VERSION_OPENSSL=openssl-1.1.1f \
     SHA256_OPENSSL=186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35 \
     SOURCE_OPENSSL=https://www.openssl.org/source/ \
-    OPGP_OPENSSL=8657ABB260F056B1E5190839D9C4D26D0E604491
 
 WORKDIR /tmp/src
 
@@ -13,12 +12,6 @@ RUN set -e -x && \
       $build_deps && \
     curl -L $SOURCE_OPENSSL$VERSION_OPENSSL.tar.gz -o openssl.tar.gz && \
     echo "${SHA256_OPENSSL} ./openssl.tar.gz" | sha256sum -c - && \
-    curl -L $SOURCE_OPENSSL$VERSION_OPENSSL.tar.gz.asc -o openssl.tar.gz.asc && \
-    GNUPGHOME="$(mktemp -d)" && \
-    export GNUPGHOME && \
-    ( gpg --no-tty --keyserver ipv4.pool.sks-keyservers.net --recv-keys "$OPGP_OPENSSL" \
-    || gpg --no-tty --keyserver ha.pool.sks-keyservers.net --recv-keys "$OPGP_OPENSSL" || gpg --no-tty --keyserver na.pool.sks-keyservers.net --recv-keys "$OPGP_OPENSSL" ) && \
-    gpg --batch --verify openssl.tar.gz.asc openssl.tar.gz && \
     tar xzf openssl.tar.gz && \
     cd $VERSION_OPENSSL && \
     ./config \
@@ -40,7 +33,7 @@ RUN set -e -x && \
         /var/tmp/* \
         /var/lib/apt/lists/*
 
-FROM arm32v7/debian:buster as unbound
+FROM multiarch/debian-debootstrap:armhf-stretch-slim as unbound
 
 ENV NAME=unbound \
     UNBOUND_VERSION=1.10.0 \
@@ -58,7 +51,7 @@ RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make" && \
       bsdmainutils \
       ca-certificates \
       ldnsutils \
-      libevent-2.1-6 \
+      libevent-2.0-5 \
       libexpat1 && \
     curl -sSL $UNBOUND_DOWNLOAD_URL -o unbound.tar.gz && \
     echo "${UNBOUND_SHA256} *unbound.tar.gz" | sha256sum -c - && \
@@ -72,8 +65,8 @@ RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make" && \
         --prefix=/opt/unbound \
         --with-pthreads \
         --with-username=_unbound \
-        --with-ssl=/opt/openssl \
         --with-libevent \
+	--with-ssl=/opt/openssl \
         --enable-tfo-server \
         --enable-tfo-client \
         --enable-event-api && \
@@ -87,8 +80,7 @@ RUN build_deps="curl gcc libc-dev libevent-dev libexpat1-dev make" && \
         /var/tmp/* \
         /var/lib/apt/lists/*
 
-
-FROM arm32v7/debian:buster
+FROM multiarch/debian-debootstrap:armhf-stretch-slim
 
 ENV NAME=unbound \
     VERSION=1.4 \
