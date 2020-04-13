@@ -33,7 +33,8 @@ docker run -d \
   -v /var/log/unbound.log:/var/log/unbound.log \
   --restart=unless-stopped \
   --entrypoint=/unbound-entrypoint.sh \
-  "${UNBOUND}"
+  "${UNBOUND}" \
+  /unbound-entrypoint.sh
 
 if ! docker inspect pihole > /dev/null; then
   docker run -d \
