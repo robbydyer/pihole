@@ -13,7 +13,6 @@ if ! dpkg -l | grep docker.io; then
     lsof
 fi
 
-docker pull "${UNBOUND}"
 docker pull pihole/pihole:latest
 
 if ! docker network inspect "${NET}" &> /dev/null; then 
