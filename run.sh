@@ -2,6 +2,7 @@
 # Run this on the Raspberry-pi to start the containers
 set -euo pipefail
 
+ROOT="$(git rev-parse --show-toplevel)"
 NET="piholenet"
 UNBOUND="myunbound:latest"
 
@@ -76,3 +77,7 @@ docker run -d \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
   pihole/pihole:latest
+
+if [ -f "${ROOT}/.webpass" ]; then
+  "${ROOT}/set_admin_password.sh"
+fi
