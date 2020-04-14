@@ -10,7 +10,14 @@ if ! dpkg -l | grep docker.io; then
   apt-get install -y \
     docker.io \
     dnsutils \
+    vim \
     lsof
+fi
+
+if [ ! -f /etc/init.d/pihole ] || ! diff /etc/init.d/pihole pihole.initd &> /dev/null; then
+  echo "=> Installing /etc/init.d/pihole"
+  cp pihole.initd /etc/init.d/pihole
+  chmod 755 /etc/init.d/pihole
 fi
 
 docker pull pihole/pihole:latest
