@@ -2,7 +2,7 @@
 
 On your raspberry pi:
 ```shell
-curl https://raw.githubusercontent.com/robbydyer/pihole/master/bootstrap.sh | bash
+curl https://raw.githubusercontent.com/robbydyer/pihole/master/bootstrap.sh | sudo bash
 ```
 
 Set the web admin password:

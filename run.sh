@@ -3,7 +3,6 @@
 set -euo pipefail
 
 NET="piholenet"
-#UNBOUND="mvance/unbound:latest"
 UNBOUND="myunbound:latest"
 
 if ! dpkg -l | grep docker.io; then
@@ -24,33 +23,34 @@ if ! docker images | grep "${UNBOUND}"; then
   docker build -f Dockerfile.unbound -t "${UNBOUND}" .
 fi
 
-# Restart unbound each time
-if docker inspect unbound &> /dev/null; then
-  if docker ps | grep unbound &> /dev/nulll; then
-    docker kill unbound
+remove_container() {
+  container="$1"
+  if docker inspect "${container}" &> /dev/null; then
+    echo "=> Killing docker container '${container}'"
+    docker kill "${container}"
   fi
-  docker rm unbound
-fi
+  echo "=> Removing docker container '${container}'"
+  docker rm "${container}"
+}
 
-touch /var/log/unbound.log
 
+remove_container unbound
+
+set -x
 docker run -d \
   --name unbound \
   --network "${NET}" \
+  --restart=unless-stopped \
   --privileged \
   --publish 5354:5354/udp \
   --publish 5354:5354/tcp \
   -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pihole.conf \
   "${UNBOUND}"
+set +x
 
 UNBOUND_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' unbound)"
 
-if docker inspect pihole &> /dev/null; then
-  if docker ps | grep pihole &> /dev/null; then
-    docker kill pihole
-  fi
-  docker rm pihole
-fi
+remove_container pihole
 
 set -x
 docker run -d \
@@ -63,9 +63,8 @@ docker run -d \
   --publish 53:53/udp \
   --publish 53:53/tcp \
   -e TZ="America/New York" \
-  -e VIRTUAL_HOST=pihole.local \
   -e DNS1="${UNBOUND_IP}#5354" \
-  -e DNS2="" \
+  -e DNS2="8.8.8.8" \
   -e DNSSEC=true \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
