@@ -10,12 +10,16 @@
 ### END INIT INFO
 set -euo pipefail
 
+PIHOME="/home/pi/pihole"
+
 case "$1" in
 start)
-	/home/pi/pihole/run.sh
-	;;
+  cd "${PIHOME}"
+  ./run.sh
+  ./set_admin_password.sh
+  ;;
 stop)
-	docker kill unbound
-	docker kill pihole
-	;;
+  docker kill unbound
+  docker kill pihole
+  ;;
 esac
