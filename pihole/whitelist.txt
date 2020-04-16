@@ -1,3 +1,5 @@
 gstatic.com
 raw.githubusercontent.com
 hosts-file.net
+bugsnag.appstore.a2z.com
+bugsnag.com
