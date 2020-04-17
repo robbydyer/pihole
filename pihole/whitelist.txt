@@ -4,3 +4,6 @@ hosts-file.net
 bugsnag.appstore.a2z.com
 bugsnag.com
 notify.bugsnag.com
+rsglab.com
+mailchimp.com
+git.rsglab.com
