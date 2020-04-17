@@ -7,3 +7,4 @@ notify.bugsnag.com
 rsglab.com
 mailchimp.com
 git.rsglab.com
+mcvpn.rsglab.com
