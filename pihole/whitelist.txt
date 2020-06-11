@@ -7,3 +7,16 @@ notify.bugsnag.com
 rsglab.com
 mailchimp.com
 git.rsglab.com
+messaging.discover.com
+discover.com
+wchat.us2.freshchat.com
+freshchat.com
+api.tinypass.com
+nbcume.sc.omtrdc.net
+nbcu.demdex.net
+geo.nbcsports.com
+udm.scorecardresearch.com
+b.scorecardresearch.com
+dpm.demdex.net
+experience.tinypass.com
+nbc.demdex.net
