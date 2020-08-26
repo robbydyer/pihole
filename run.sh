@@ -66,7 +66,7 @@ docker run -d \
   --network "${NET}" \
   --restart=unless-stopped \
   --privileged \
-  --publish 80:80 \
+  --publish 8080:80 \
   --publish 443:443 \
   --publish 53:53/udp \
   --publish 53:53/tcp \
