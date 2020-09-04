@@ -42,7 +42,7 @@ remove_container() {
 }
 
 
-remove_container unbound
+remove_container unbound || true
 
 set -x
 docker run -d \
@@ -58,7 +58,7 @@ set +x
 
 UNBOUND_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' unbound)"
 
-remove_container pihole
+remove_container pihole || true
 
 set -x
 docker run -d \
