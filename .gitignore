@@ -12,3 +12,5 @@ pihole/setupVars.conf
 dnsmasq/01-pihole.conf
 !pihole/lan.list
 !pihole/adlists.list
+!pihole/black.list
+!pihole/white.list
