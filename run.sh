@@ -22,6 +22,8 @@ if [ ! -f /etc/init.d/pihole ] || ! diff /etc/init.d/pihole pihole.initd &> /dev
 fi
 
 docker pull pihole/pihole:latest
+img=mypihole
+docker build -f Dockerfile.pihole -t ${img} .
 
 if ! docker network inspect "${NET}" &> /dev/null; then 
   docker network create "${NET}"
@@ -60,6 +62,8 @@ UNBOUND_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress
 
 remove_container pihole || true
 
+lists_path="$(realpath $(pwd)/../my-pihole-lists)"
+
 set -x
 docker run -d \
   --name pihole \
@@ -76,7 +80,11 @@ docker run -d \
   -e DNSSEC=true \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
-  pihole/pihole:latest
+  -v "$(pwd)/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
+  -v "${lists_path}":/etc/my-pihole-lists \
+  -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
+  -v "${HOME}/.gitconfig":/root/.gitconfig \
+  ${img}
 
 if [ -f "${ROOT}/.webpass" ]; then
   "${ROOT}/set_admin_password.sh"
