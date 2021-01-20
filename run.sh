@@ -84,6 +84,7 @@ docker run -d \
   -v "${lists_path}":/etc/my-pihole-lists \
   -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
   -v "${HOME}/.gitconfig":/root/.gitconfig \
+  -v "$(pwd)/sync.cron":/etc/cron.d/pihole-sync \
   ${img}
 
 if [ -f "${ROOT}/.webpass" ]; then
