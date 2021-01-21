@@ -1,3 +1,5 @@
+pihole/migration_backup
+sync.cron
 .webpass
 *.swp
 *.list

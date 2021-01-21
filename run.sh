@@ -64,6 +64,9 @@ remove_container pihole || true
 
 lists_path="$(realpath $(pwd)/../my-pihole-lists)"
 
+tok=""
+[ -f "${HOME}/.ghtoken" ] && tok="$(cat ${HOME}/.ghtoken)"
+
 set -x
 docker run -d \
   --name pihole \
@@ -78,6 +81,7 @@ docker run -d \
   -e DNS1="${UNBOUND_IP}#5354" \
   -e DNS2="${UNBOUND_IP}#5354" \
   -e DNSSEC=true \
+  -e GH_TOKEN="${tok}" \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
   -v "$(pwd)/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
