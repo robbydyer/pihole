@@ -39,6 +39,7 @@ dnsmasq_dir='/etc/dnsmasq.d/'
 ad_list='adlist.csv'
 custom_list='custom.list'
 domain_list='domainlist.csv'
+lan_list='lan.list'
 cname_list='02-lan.conf'
 ###########################################################################
 # SHOULDN'T NEED TO EDIT BELOW THIS LINE
@@ -60,6 +61,7 @@ push_initialize () {
 
 	# Copy local Custom and CNAME lists to local Git repo
 	$SUDO cp $custom_list $personal_git_dir
+	$SUDO cp $lan_list $personal_git_dir
 	$SUDO cp $dnsmasq_dir/$cname_list $personal_git_dir
 
 	# Go to local Git repo directory
@@ -89,6 +91,7 @@ pull_initialize () {
 
 	# Overwrite local files
 	$SUDO cp $custom_list $pihole_dir
+	$SUDO cp $lan_list $pihole_dir
 	$SUDO cp $cname_list $dnsmasq_dir
 
 	# Overwrite local database tables
@@ -110,6 +113,7 @@ push () {
 
         # Copy local Custom and CNAME lists to local Git repo
         $SUDO cp $custom_list $personal_git_dir
+        $SUDO cp $lan_list $personal_git_dir
         $SUDO cp $dnsmasq_dir/$cname_list $personal_git_dir
 
 	# Go to local Git repo directory
@@ -152,6 +156,7 @@ pull () {
 		$SUDO git reset --hard origin/master -q
                 $SUDO service pihole-FTL stop
                 $SUDO cp $custom_list $pihole_dir
+                $SUDO cp $lan_list $pihole_dir
                 $SUDO cp $cname_list $dnsmasq_dir
                 $SUDO sqlite3 $gravity_db "DROP TABLE adlist;"
                 $SUDO sqlite3 $gravity_db -header -csv ".import adlist.csv adlist"
