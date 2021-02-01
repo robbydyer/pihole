@@ -1,3 +1,4 @@
+pihole/lan.list
 pihole/migration_backup
 sync.cron
 .webpass
