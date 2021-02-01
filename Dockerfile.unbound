@@ -5,14 +5,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
     dnsutils \
+    dns-root-data \
     lsof \
     unbound && \
     apt-get purge -y --auto-remove
 
-ADD ./unbound-root.key /var/lib/unbound/root.key
+# OLD. Using the dns-root-data pkg now
+#ADD ./unbound-root.key /var/lib/unbound/root.key
+#ADD https://www.internic.net/domain/named.root /var/lib/unbound/root.hints
+#RUN chmod 644 /var/lib/unbound/root.hints
 
-ADD https://www.internic.net/domain/named.root /var/lib/unbound/root.hints
-RUN chmod 644 /var/lib/unbound/root.hints
+# We use the dns-root-data provided file now
+RUN rm -f /etc/unbound/unbound.conf.d/root-auto-trust-anchor-file.conf
 
 EXPOSE 5354/udp
 EXPOSE 5354/tcp
