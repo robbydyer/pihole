@@ -10,13 +10,9 @@ RUN apt-get update && \
     unbound && \
     apt-get purge -y --auto-remove
 
-# OLD. Using the dns-root-data pkg now
-#ADD ./unbound-root.key /var/lib/unbound/root.key
-#ADD https://www.internic.net/domain/named.root /var/lib/unbound/root.hints
-#RUN chmod 644 /var/lib/unbound/root.hints
-
-# We use the dns-root-data provided file now
-RUN rm -f /etc/unbound/unbound.conf.d/root-auto-trust-anchor-file.conf
+ADD ./unbound-root.key /var/lib/unbound/root.key
+ADD https://www.internic.net/domain/named.root /var/lib/unbound/root.hints
+RUN chmod 644 /var/lib/unbound/root.hints
 
 EXPOSE 5354/udp
 EXPOSE 5354/tcp
