@@ -80,7 +80,7 @@ docker run -d \
   -e TZ="America/New York" \
   -e DNS1="${UNBOUND_IP}#5354" \
   -e DNS2="${UNBOUND_IP}#5354" \
-  -e DNSSEC=true \
+  -e DNSSEC=false \
   -e GH_TOKEN="${tok}" \
   -v "$(pwd)/pihole":/etc/pihole \
   -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
