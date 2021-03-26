@@ -81,9 +81,9 @@ docker run -d \
   -e DNS1="${UNBOUND_IP}#5354" \
   -e DNS2="${UNBOUND_IP}#5354" \
   -e DNSSEC=false \
+  -e CACHE_SIZE=0 \
   -e GH_TOKEN="${tok}" \
   -v "$(pwd)/pihole":/etc/pihole \
-  -v "$(pwd)/dnsmasq":/etc/dnsmasq.d \
   -v "$(pwd)/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
   -v "${lists_path}":/etc/my-pihole-lists \
   -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
@@ -94,3 +94,6 @@ docker run -d \
 if [ -f "${ROOT}/.webpass" ]; then
   "${ROOT}/set_admin_password.sh"
 fi
+
+sleep 10
+docker exec pihole bash -cex "sed -i 's/cache-size.*/cache-size=0/' /etc/dnsmasq.d/01-pihole.conf && /usr/local/bin/pihole restartdns"
