@@ -89,6 +89,7 @@ docker run -d \
   -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
   -v "${HOME}/.gitconfig":/root/.gitconfig \
   -v "$(pwd)/sync.cron":/etc/cron.d/pihole-sync \
+  -v "$(pwd)/dnsmasq/02-lan.conf":/etc/dnsmasq.d/02-lan.conf \
   ${img}
 
 if [ -f "${ROOT}/.webpass" ]; then
