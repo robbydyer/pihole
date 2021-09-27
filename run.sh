@@ -54,7 +54,7 @@ docker run -d \
   --privileged \
   --publish 5354:5354/udp \
   --publish 5354:5354/tcp \
-  -v "$(pwd)/unbound.conf":/etc/unbound/unbound.conf.d/pihole.conf \
+  -v "${ROOT}/unbound.conf":/etc/unbound/unbound.conf.d/pihole.conf \
   "${UNBOUND}"
 set +x
 
@@ -62,7 +62,7 @@ UNBOUND_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress
 
 remove_container pihole || true
 
-lists_path="$(realpath $(pwd)/../my-pihole-lists)"
+lists_path="$(realpath ${ROOT}/../my-pihole-lists)"
 
 tok=""
 [ -f "${HOME}/.ghtoken" ] && tok="$(cat ${HOME}/.ghtoken)"
@@ -81,20 +81,23 @@ docker run -d \
   -e DNS1="${UNBOUND_IP}#5354" \
   -e DNS2="${UNBOUND_IP}#5354" \
   -e DNSSEC=false \
-  -e CACHE_SIZE=0 \
+  -e CUSTOM_CACHE_SIZE=0 \
   -e GH_TOKEN="${tok}" \
-  -v "$(pwd)/pihole":/etc/pihole \
-  -v "$(pwd)/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
+  -e WEBPASSWORD_FILE=/webpass \
+  -v "${ROOT}/.webpass":/webpass \
+  -v "${ROOT}/pihole":/etc/pihole \
+  -v "${ROOT}/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
   -v "${lists_path}":/etc/my-pihole-lists \
   -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
   -v "${HOME}/.gitconfig":/root/.gitconfig \
-  -v "$(pwd)/sync.cron":/etc/cron.d/pihole-sync \
-  -v "$(pwd)/dnsmasq/02-lan.conf":/etc/dnsmasq.d/02-lan.conf \
+  -v "${ROOT}/sync.cron":/etc/cron.d/pihole-sync \
+  -v "${ROOT}/dnsmasq/02-lan.conf":/etc/dnsmasq.d/02-lan.conf \
   ${img}
 
-if [ -f "${ROOT}/.webpass" ]; then
-  "${ROOT}/set_admin_password.sh"
-fi
+#if [ -f "${ROOT}/.webpass" ]; then
+  #"${ROOT}/set_admin_password.sh"
+#fi
 
-sleep 10
-docker exec pihole bash -cex "sed -i 's/cache-size.*/cache-size=0/' /etc/dnsmasq.d/01-pihole.conf && /usr/local/bin/pihole restartdns"
+#sleep 10
+# CACHE_SIZE should be fixed now https://github.com/pi-hole/docker-pi-hole/pull/689
+#docker exec pihole bash -cex "sed -i 's/cache-size.*/cache-size=0/' /etc/dnsmasq.d/01-pihole.conf && /usr/local/bin/pihole restartdns"

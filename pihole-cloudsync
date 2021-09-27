@@ -123,6 +123,8 @@ push () {
         $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM adlist" >$ad_list
         $SUDO sqlite3 $gravity_db -header -csv "SELECT * FROM domainlist" >$domain_list
 
+	set -x
+
 	# Compare local files to remote Git repo
 	$SUDO git remote update > /dev/null
 
