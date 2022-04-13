@@ -21,9 +21,9 @@ if [ ! -f /etc/init.d/pihole ] || ! diff /etc/init.d/pihole pihole.initd &> /dev
   chmod 755 /etc/init.d/pihole
 fi
 
-docker pull pihole/pihole:latest
-img=mypihole
-docker build -f Dockerfile.pihole -t ${img} .
+img=pihole/pihole:2022.04
+docker pull "${img}"
+#docker build -f Dockerfile.pihole -t ${img} .
 
 if ! docker network inspect "${NET}" &> /dev/null; then 
   docker network create "${NET}"
@@ -64,10 +64,8 @@ remove_container pihole || true
 
 lists_path="$(realpath ${ROOT}/../my-pihole-lists)"
 
-tok=""
-[ -f "${HOME}/.ghtoken" ] && tok="$(cat ${HOME}/.ghtoken)"
-
 set -x
+  #-v "${ROOT}/sync.cron":/etc/cron.d/pihole-sync \
 docker run -d \
   --name pihole \
   --network "${NET}" \
@@ -78,11 +76,9 @@ docker run -d \
   --publish 53:53/udp \
   --publish 53:53/tcp \
   -e TZ="America/New York" \
-  -e DNS1="${UNBOUND_IP}#5354" \
-  -e DNS2="${UNBOUND_IP}#5354" \
+  -e PIHOLE_DNS="${UNBOUND_IP}#5354" \
   -e DNSSEC=false \
   -e CUSTOM_CACHE_SIZE=0 \
-  -e GH_TOKEN="${tok}" \
   -e WEBPASSWORD_FILE=/webpass \
   -v "${ROOT}/.webpass":/webpass \
   -v "${ROOT}/pihole":/etc/pihole \
@@ -90,13 +86,9 @@ docker run -d \
   -v "${lists_path}":/etc/my-pihole-lists \
   -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
   -v "${HOME}/.gitconfig":/root/.gitconfig \
-  -v "${ROOT}/sync.cron":/etc/cron.d/pihole-sync \
   -v "${ROOT}/dnsmasq/02-lan.conf":/etc/dnsmasq.d/02-lan.conf \
   ${img}
 
-#if [ -f "${ROOT}/.webpass" ]; then
-  #"${ROOT}/set_admin_password.sh"
-#fi
 
 #sleep 10
 # CACHE_SIZE should be fixed now https://github.com/pi-hole/docker-pi-hole/pull/689
