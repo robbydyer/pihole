@@ -21,7 +21,7 @@ if [ ! -f /etc/init.d/pihole ] || ! diff /etc/init.d/pihole pihole.initd &> /dev
   chmod 755 /etc/init.d/pihole
 fi
 
-img=pihole/pihole:2022.04
+img=pihole/pihole:2022.02.1
 docker pull "${img}"
 #docker build -f Dockerfile.pihole -t ${img} .
 
