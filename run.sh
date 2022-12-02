@@ -2,9 +2,11 @@
 # Run this on the Raspberry-pi to start the containers
 set -euo pipefail
 
-ROOT="$(git rev-parse --show-toplevel)"
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "${ROOT}"
+
 NET="piholenet"
-UNBOUND="myunbound:latest"
+UNBOUND="myunbound:$(sha256sum Dockerfile.unbound | awk '{print $1}')"
 
 if ! dpkg -l | grep docker.io; then
   apt-get update
@@ -21,7 +23,7 @@ if [ ! -f /etc/init.d/pihole ] || ! diff /etc/init.d/pihole pihole.initd &> /dev
   chmod 755 /etc/init.d/pihole
 fi
 
-img=pihole/pihole:2022.02.1
+img=pihole/pihole:2022.11.2
 docker pull "${img}"
 #docker build -f Dockerfile.pihole -t ${img} .
 
@@ -66,11 +68,19 @@ lists_path="$(realpath ${ROOT}/../my-pihole-lists)"
 
 set -x
   #-v "${ROOT}/sync.cron":/etc/cron.d/pihole-sync \
+  #-v "${ROOT}/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
+  #-v "${HOME}/.gitconfig":/root/.gitconfig \
+  #-v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
+#  --privileged \
+#  --cap-add=NET_ADMIN \
+#  --cap-add=NET_BIND_SERVICE \
+#  --cap-add=NET_RAW \
+#  --cap-add=SYS_NICE \
+#  --cap-add=CHOWN \
 docker run -d \
   --name pihole \
   --network "${NET}" \
   --restart=unless-stopped \
-  --privileged \
   --publish 8080:80 \
   --publish 443:443 \
   --publish 53:53/udp \
@@ -79,13 +89,11 @@ docker run -d \
   -e PIHOLE_DNS="${UNBOUND_IP}#5354" \
   -e DNSSEC=false \
   -e CUSTOM_CACHE_SIZE=0 \
+  -e RATE_LIMIT="0/0" \
   -e WEBPASSWORD_FILE=/webpass \
   -v "${ROOT}/.webpass":/webpass \
   -v "${ROOT}/pihole":/etc/pihole \
-  -v "${ROOT}/pihole-cloudsync":/usr/local/bin/pihole-cloudsync \
   -v "${lists_path}":/etc/my-pihole-lists \
-  -v "${HOME}/.ssh/id_rsa":/root/.ssh/id_rsa \
-  -v "${HOME}/.gitconfig":/root/.gitconfig \
   -v "${ROOT}/dnsmasq/02-lan.conf":/etc/dnsmasq.d/02-lan.conf \
   ${img}
 

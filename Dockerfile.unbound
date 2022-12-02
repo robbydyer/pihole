@@ -1,4 +1,4 @@
-FROM multiarch/debian-debootstrap:armhf-stretch-slim
+FROM multiarch/debian-debootstrap:arm64-bullseye-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
