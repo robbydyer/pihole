@@ -11,7 +11,7 @@ services:
     container_name: pihole
     hostname: pihole
     image: pihole/pihole:2022.11.2
-    shm_size: 8gb
+    shm_size: 4gb
     restart: always
     networks:
       piholenet:
@@ -23,7 +23,7 @@ services:
       - "53:53/tcp"
     environment:
       TZ: "America/New York"
-      PIHOLE_DNS_: "10.1.0.2#5354"
+      PIHOLE_DNS_: "10.1.0.2"
       DNSSEC: "false"
       CUSTOM_CACHE_SIZE: "0"
       RATE_LIMIT: "0/0"
@@ -50,8 +50,10 @@ services:
     environment:
       DNSMASQ_USER: "root"
     ports:
-      - "5354:5354/udp"
-      - "5354:5354/tcp"
+      - "53/udp"
+      - "53/tcp"
+      #- "5354:5354/udp"
+      #- "5354:5354/tcp"
     volumes:
       - /home/rob/pihole/unboundconf/a-records.conf:/opt/unbound/etc/unbound/a-records.conf:ro
       - /home/rob/pihole/unboundconf/srv-records.conf:/opt/unbound/etc/unbound/srv-records.conf:ro
