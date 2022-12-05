@@ -1,0 +1,50 @@
+version: "3"
+networks:
+  piholenet:
+    ipam:
+      config:
+      - subnet: 172.20.0.0/24
+services:
+  pihole:
+    container_name: pihole
+    hostname: pihole
+    image: pihole/pihole:2022.11.2
+    restart: always
+    networks:
+      piholenet:
+        ipv4_address: 172.20.0.2
+    ports:
+      - "8080:80/tcp"
+      - "443:443/tcp"
+      - "53:53/udp"
+      - "53:53/tcp"
+    environment:
+      TZ: "America/New York"
+      PIHOLE_DNS: "172.20.0.3#5354"
+      DNSSEC: "false"
+      CUSTOM_CACHE_SIZE: "0"
+      RATE_LIMIT: "0/0"
+      WEBPASSWORD_FILE: "/webpass"
+    volumes:
+      - /home/rob/pihole/.webpass:/webpass:ro
+      - /home/rob/pihole/pihole:/etc/pihole:rw
+      - /home/rob/pihole/dnsmasq/02-lan.conf:/etc/dnsmasq.d/02-lan.conf:ro
+
+  unbound:
+    container_name: unbound
+    build:
+      context: .
+      # Source https://github.com/MatthewVance/unbound-docker
+      # They don't support ARM yet, so build it ourselves
+      dockerfile: "Dockerfile.mvanceunbound"
+    restart: always
+    networks:
+      piholenet:
+        ipv4_address: 172.20.0.3
+    ports:
+      - "5354:5354/udp"
+      - "5354:5354/tcp"
+    volumes:
+      - /home/rob/pihole/unboundconf/a-records.conf:/opt/unbound/etc/unbound/a-records.conf:ro
+      - /home/rob/pihole/unboundconf/srv-records.conf:/opt/unbound/etc/unbound/srv-records.conf:ro
+      - /home/rob/pihole/unboundconf/forward-records.conf:/opt/unbound/etc/unbound/forward-records.conf:ro

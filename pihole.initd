@@ -16,10 +16,9 @@ case "$1" in
 start)
   cd "${PIHOME}"
   ./run.sh
-  ./set_admin_password.sh
   ;;
 stop)
-  docker kill unbound
-  docker kill pihole
+  cd "${PIHOME}"
+  docker-compose stop
   ;;
 esac
