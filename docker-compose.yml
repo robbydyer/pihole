@@ -1,18 +1,21 @@
-version: "3"
+version: "2"
 networks:
   piholenet:
     ipam:
+      driver: default
       config:
-      - subnet: 172.20.0.0/24
+      - subnet: 10.1.0.0/24
+
 services:
   pihole:
     container_name: pihole
     hostname: pihole
     image: pihole/pihole:2022.11.2
+    shm_size: 8gb
     restart: always
     networks:
       piholenet:
-        ipv4_address: 172.20.0.2
+        ipv4_address: 10.1.0.3
     ports:
       - "8080:80/tcp"
       - "443:443/tcp"
@@ -20,11 +23,13 @@ services:
       - "53:53/tcp"
     environment:
       TZ: "America/New York"
-      PIHOLE_DNS: "172.20.0.3#5354"
+      PIHOLE_DNS_: "10.1.0.2#5354"
       DNSSEC: "false"
       CUSTOM_CACHE_SIZE: "0"
       RATE_LIMIT: "0/0"
       WEBPASSWORD_FILE: "/webpass"
+      DNSMASQ_USER: "root"
+      PIHOLE_UID: "0"
     volumes:
       - /home/rob/pihole/.webpass:/webpass:ro
       - /home/rob/pihole/pihole:/etc/pihole:rw
@@ -32,6 +37,7 @@ services:
 
   unbound:
     container_name: unbound
+    privileged: true
     build:
       context: .
       # Source https://github.com/MatthewVance/unbound-docker
@@ -40,7 +46,9 @@ services:
     restart: always
     networks:
       piholenet:
-        ipv4_address: 172.20.0.3
+        ipv4_address: 10.1.0.2
+    environment:
+      DNSMASQ_USER: "root"
     ports:
       - "5354:5354/udp"
       - "5354:5354/tcp"

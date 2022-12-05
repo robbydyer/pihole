@@ -55,7 +55,7 @@ server:
     # data in the cache is as the domain owner intended, higher values,
     # especially more than an hour or so, can lead to trouble as the data in
     # the cache does not match up with the actual data any more.
-    cache-min-ttl: 300
+    cache-min-ttl: 0
 
     # Set the working directory for the program.
     directory: "/opt/unbound/etc/unbound"
@@ -73,7 +73,7 @@ server:
 
     # Listen to for queries from clients and answer from this network interface
     # and port.
-    interface: 0.0.0.0@53
+    interface: 0.0.0.0@5354
 
     # Rotates RRSet order in response (the pseudo-random number is taken from
     # the query ID, for speed and thread safety).
@@ -101,7 +101,7 @@ server:
     # If you want to log to a file, use:
     # logfile: /opt/unbound/etc/unbound/unbound.log
     # Set log location (using /dev/null further limits logging)
-    logfile: /dev/null
+    logfile: /dev/stdout
 
     # Set logging level
     # Level 0: No verbosity, only errors.
@@ -154,8 +154,8 @@ server:
     access-control: 192.168.0.0/16 allow
     access-control: 172.16.0.0/12 allow
     access-control: 10.0.0.0/8 allow
-    # access-control: fc00::/7 allow
-    # access-control: ::1/128 allow
+    access-control: fc00::/7 allow
+    access-control: ::1/128 allow
 
     # File with trust anchor for  one  zone, which is tracked with RFC5011
     # probes.
@@ -225,9 +225,12 @@ server:
     private-address: 172.16.0.0/12
     private-address: 192.168.0.0/16
     private-address: 169.254.0.0/16
-    # private-address: fd00::/8
-    # private-address: fe80::/10
+    private-address: fd00::/8
+    private-address: fe80::/10
     # private-address: ::ffff:0:0/96
+
+    private-domain: "local."
+    domain-insecure: "local."
 
     # Enable ratelimiting of queries (per second) sent to nameserver for
     # performing recursion. More queries are turned away with an error
