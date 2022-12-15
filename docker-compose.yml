@@ -38,6 +38,7 @@ services:
   unbound:
     container_name: unbound
     privileged: true
+    command: /data/unbound.sh
     build:
       context: .
       # Source https://github.com/MatthewVance/unbound-docker
@@ -55,6 +56,7 @@ services:
       #- "5354:5354/udp"
       #- "5354:5354/tcp"
     volumes:
+      - /home/rob/pihole/data:/data
       - /home/rob/pihole/unboundconf/a-records.conf:/opt/unbound/etc/unbound/a-records.conf:ro
       - /home/rob/pihole/unboundconf/srv-records.conf:/opt/unbound/etc/unbound/srv-records.conf:ro
       - /home/rob/pihole/unboundconf/forward-records.conf:/opt/unbound/etc/unbound/forward-records.conf:ro

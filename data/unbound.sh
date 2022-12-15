@@ -42,6 +42,10 @@ server:
     ###########################################################################
     # BASIC SETTINGS
     ###########################################################################
+    do-ip4: yes
+    do-ip6: no
+    do-tcp: yes
+    do-udp: yes
     # Time to live maximum for RRsets and messages in the cache. If the maximum
     # kicks in, responses to clients still get decrementing TTLs based on the
     # original (larger) values. When the internal TTL expires, the cache item
@@ -69,7 +73,8 @@ server:
     # is seen as extreme, since the amount of TCP fallback generated is
     # excessive (probably also for this resolver, consider tuning the outgoing
     # tcp number).
-    edns-buffer-size: 1232
+    #edns-buffer-size: 1232
+    edns-buffer-size: 1472
 
     # Listen to for queries from clients and answer from this network interface
     # and port.
@@ -80,7 +85,7 @@ server:
     rrset-roundrobin: yes
 
     # Drop user  privileges after  binding the port.
-    username: "_unbound"
+    #username: "_unbound"
 
     ###########################################################################
     # LOGGING
@@ -90,13 +95,13 @@ server:
     log-local-actions: no
 
     # Do not print one line per query to the log
-    log-queries: no
+    log-queries: yes
 
     # Do not print one line per reply to the log
-    log-replies: no
+    log-replies: yes
 
     # Do not print log lines that say why queries return SERVFAIL to clients
-    log-servfail: no
+    log-servfail: yes
 
     # If you want to log to a file, use:
     # logfile: /opt/unbound/etc/unbound/unbound.log
@@ -110,7 +115,7 @@ server:
     # Level 3: Gives query level information, output per query.
     # Level 4:  Gives algorithm level information.
     # Level 5: Logs client identification for cache misses.
-    verbosity: 0
+    verbosity: 2
 
     ###########################################################################
     # PRIVACY SETTINGS
@@ -185,23 +190,23 @@ server:
     harden-glue: yes
 
     # Ignore very large queries.
-    harden-large-queries: yes
+    #harden-large-queries: yes
 
     # Perform additional queries for infrastructure data to harden the referral
     # path. Validates the replies if trust anchors are configured and the zones
     # are signed. This enforces DNSSEC validation on nameserver NS sets and the
     # nameserver addresses that are encountered on the referral path to the
     # answer. Experimental option.
-    harden-referral-path: no
+    #harden-referral-path: no
 
     # Ignore very small EDNS buffer sizes from queries.
-    harden-short-bufsize: yes
+    #harden-short-bufsize: yes
 
     # If enabled the HTTP header User-Agent is not set. Use with caution
     # as some webserver configurations may reject HTTP requests lacking
     # this header. If needed, it is better to explicitly set the
     # the http-user-agent.
-    hide-http-user-agent: no
+    #hide-http-user-agent: no
 
     # Refuse id.server and hostname.bind queries
     hide-identity: yes
@@ -346,6 +351,8 @@ server:
     # try to set the SO_REUSEPORT socket option on each socket. May distribute
     # incoming queries to threads more evenly.
     so-reuseport: yes
+
+    private-domain: "plex.direct"
 
     ###########################################################################
     # LOCAL ZONE
