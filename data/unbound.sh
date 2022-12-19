@@ -236,6 +236,8 @@ server:
 
     private-domain: "local."
     domain-insecure: "local."
+    private-domain: "home."
+    domain-insecure: "home."
 
     # Enable ratelimiting of queries (per second) sent to nameserver for
     # performing recursion. More queries are turned away with an error
